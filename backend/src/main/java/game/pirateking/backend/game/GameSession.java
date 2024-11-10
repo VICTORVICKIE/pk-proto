@@ -1,4 +1,6 @@
-package game.pirateking.backend;
+package game.pirateking.backend.game;
+
+import game.pirateking.backend.Player;
 
 import java.util.HashSet;
 

@@ -1,8 +1,10 @@
-package game.pirateking.backend;
+package game.pirateking.backend.connection;
 
+import game.pirateking.backend.game.GameManager;
+import game.pirateking.backend.model.Command;
+import game.pirateking.backend.model.Command.ACTION;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 
@@ -24,25 +26,24 @@ public class WSMsgHandler implements WebSocketHandler {
 	@Override
 	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
 		String payload = (String) message.getPayload();
-		System.out.printf("Message: %s\n", payload);
-		session.sendMessage(new TextMessage("Started processing msg in server: " + session + " - " + payload));
-		String[] command = payload.split("\\.");
-		if (command.length >= 3  && command[2].equals("host")) {
-			String gameId = gameManager.initGame(command[1], session);
-			System.out.println("[App] - Init Game: " + gameId);
+		String[] commandArray = payload.split("\\.");
+		Command command = new Command(commandArray);
+
+		ACTION action = command.getAction();
+		String playerId = command.getPlayerId();
+
+		if (action.equals(Command.ACTION.HOST)) {
+			String gameId = gameManager.initGame(command.getPlayerId(), session);
 			JSONObject resp = new JSONObject();
 			resp.put("gameId", gameId);
 			session.sendMessage(new TextMessage(resp.toString()));
-		} else if (command.length >= 4 && command[2].equals("join")) {
-			String gameId = command[3];
-			gameManager.addPlayer(gameId, command[1], session);
-		} else if (command.length >= 4 && command[2].equals("roll")) {
-			String gameId = command[3];
-			gameManager.addPlayer(gameId, command[1], session);
-		} else {
-			session.sendMessage(new TextMessage("Invalid Payload: " + payload));
+		} else if (action.equals(Command.ACTION.JOIN)) {
+			String gameId = command.getGameId();
+			gameManager.addPlayer(gameId, playerId, session);
+		} else if (action.equals(ACTION.ROLL)) {
+			String gameId = command.getGameId();
+			gameManager.addPlayer(gameId, playerId, session);
 		}
-		session.sendMessage(new TextMessage("Completed processing msg in server: " + payload));
 	}
 
 	@Override

@@ -1,5 +1,6 @@
-package game.pirateking.backend;
+package game.pirateking.backend.config;
 
+import game.pirateking.backend.connection.WSMsgHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -7,11 +8,11 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
-public class WSConfig implements WebSocketConfigurer {
+public class WebConfig implements WebSocketConfigurer {
 
 	private final WSMsgHandler wsMsgHandler;
 
-    public WSConfig(WSMsgHandler wsMsgHandler) {
+    public WebConfig(WSMsgHandler wsMsgHandler) {
         this.wsMsgHandler = wsMsgHandler;
     }
 
