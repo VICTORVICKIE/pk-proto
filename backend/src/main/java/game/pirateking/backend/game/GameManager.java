@@ -1,5 +1,6 @@
-package game.pirateking.backend;
+package game.pirateking.backend.game;
 
+import game.pirateking.backend.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.WebSocketSession;
 
