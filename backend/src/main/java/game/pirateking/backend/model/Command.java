@@ -1,60 +1,63 @@
 package game.pirateking.backend.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Command {
 
     public enum ACTION {
-        JOIN("JOIN"),
         HOST("HOST"),
+        JOIN("JOIN"),
         ROLL("ROLL");
         
         ACTION(String value) {
         }
     }
 
-    public Command(String[] command) {
-        version = Integer.valueOf(command[0]);
-        playerId = command[1];
-        action = ACTION.valueOf(command[2]);
+    private final Integer version;
+    private final String playerId;
+    private final ACTION action;
+    private final List<String> args;
 
-        if(action == ACTION.JOIN){
-            gameId = command[3];
-        }
+    public Command(String c) {
+        List<String> command = decode(c);
+        version = Integer.valueOf(command.removeFirst());
+        playerId = command.removeFirst();
+        action = ACTION.valueOf(command.removeFirst());
+        args = command;
     }
 
-    private Integer version;
-    private String playerId;
-    private ACTION action;
-    private String gameId;
+    public String encode(List<String> strs) {
+        StringBuilder encoded = new StringBuilder();
+        for (String str : strs) {
+            encoded.append(str.length()).append("#").append(str);
+        }
+        return encoded.toString();
+    }
 
+    public List<String> decode(String str) {
+        var decoded = new ArrayList<String>();
+        int index = 0;
+        while (index < str.length()) {
+            int lengthIndex = index;
+            while (str.charAt(lengthIndex) != '#') {
+                lengthIndex += 1;
+            }
+            int length = Integer.parseInt(str.substring(index, lengthIndex));
+            index = lengthIndex + length + 1;
+            decoded.add(str.substring(lengthIndex + 1, index));
+        }
+        return decoded;
+    }
     public Integer getVersion() {
         return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
     }
 
     public String getPlayerId() {
         return playerId;
     }
 
-    public void setPlayerId(String playerId) {
-        this.playerId = playerId;
-    }
-
     public ACTION getAction() {
         return action;
-    }
-
-    public void setAction(ACTION action) {
-        this.action = action;
-    }
-
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
     }
 }
